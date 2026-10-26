@@ -3,18 +3,72 @@ import java.util.Scanner;
 
 public class Main {
 
+    // Sample tariff rates for project demonstration.
+    // These are not verified official billing rates.
+    public static double calculateEnergyCharge(int units) {
+        double charge = 0;
+
+        if (units <= 0) {
+            return 0;
+        }
+
+        // First 200 billable units
+        int slab = Math.min(units, 200);
+        charge += slab * 4.70;
+        units -= slab;
+
+        // Next 100 billable units
+        slab = Math.min(units, 100);
+        charge += slab * 6.30;
+        units -= slab;
+
+        // Next 100 billable units
+        slab = Math.min(units, 100);
+        charge += slab * 8.40;
+        units -= slab;
+
+        // Next 200 billable units
+        slab = Math.min(units, 200);
+        charge += slab * 9.45;
+        units -= slab;
+
+        // Next 200 billable units
+        slab = Math.min(units, 200);
+        charge += slab * 10.50;
+        units -= slab;
+
+        // Remaining units
+        if (units > 0) {
+            charge += units * 11.55;
+        }
+
+        return charge;
+    }
+
     public static void main(String[] args) {
         Scanner input = new Scanner(System.in);
 
-        System.out.println("======================================");
+        System.out.println("====================================");
         System.out.println(" SMART ELECTRICITY BILL MANAGEMENT");
-        System.out.println("======================================");
+        System.out.println("====================================");
 
         System.out.print("Enter previous meter reading: ");
-        double previous = input.nextDouble();
+
+        if (!input.hasNextInt()) {
+            System.out.println("Invalid input. Enter whole numbers.");
+            input.close();
+            return;
+        }
+        int previous = input.nextInt();
 
         System.out.print("Enter current meter reading: ");
-        double current = input.nextDouble();
+
+        if (!input.hasNextInt()) {
+            System.out.println("Invalid input. Enter whole numbers.");
+            input.close();
+            return;
+        }
+        int current = input.nextInt();
 
         if (previous < 0 || current < previous) {
             System.out.println("Invalid meter readings.");
@@ -22,59 +76,38 @@ public class Main {
             return;
         }
 
-        double units = current - previous;
+        System.out.print("Enter free-unit allowance: ");
 
-        System.out.println("\nUnits consumed: " + units);
-
-        System.out.print("Enter free units allowance: ");
-        double freeUnits = input.nextDouble();
+        if (!input.hasNextInt()) {
+            System.out.println("Invalid input. Enter whole numbers.");
+            input.close();
+            return;
+        }
+        int freeUnits = input.nextInt();
 
         if (freeUnits < 0) {
-            System.out.println("Invalid free units allowance.");
+            System.out.println("Free units cannot be negative.");
             input.close();
             return;
         }
 
-        double billableUnits = Math.max(0, units - freeUnits);
-        double estimatedBill = calculateEnergyCharge(billableUnits);
+        int consumed = current - previous;
+        int billable = Math.max(0, consumed - freeUnits);
+        double charge = calculateEnergyCharge(billable);
 
-        System.out.println("\n========== BILL SUMMARY ==========");
+        System.out.println();
+        System.out.println("========== ELECTRICITY BILL ==========");
         System.out.println("Previous reading : " + previous);
         System.out.println("Current reading  : " + current);
-        System.out.println("Units consumed   : " + units);
+        System.out.println("Units consumed   : " + consumed);
         System.out.println("Free units       : " + freeUnits);
-        System.out.println("Billable units   : " + billableUnits);
-        System.out.printf("Estimated energy charge: Rs. %.2f%n",
-                estimatedBill);
-        System.out.println("==================================");
-        System.out.println("Note: Fixed charges and official");
-        System.out.println("tariff rules are not included yet.");
+        System.out.println("Billable units   : " + billable);
+        System.out.printf("Estimated charge : Rs. %.2f%n", charge);
+        System.out.println("--------------------------------------");
+        System.out.println("Note: Sample tariff rates are used.");
+        System.out.println("Fixed charges are not included.");
+        System.out.println("======================================");
 
         input.close();
-    }
-
-    public static double calculateEnergyCharge(double units) {
-        double charge = 0;
-
-        if (units > 0) {
-            charge += Math.min(units, 100) * 0;
-        }
-        if (units > 100) {
-            charge += Math.min(units - 100, 300) * 4.70;
-        }
-        if (units > 400) {
-            charge += Math.min(units - 400, 100) * 6.30;
-        }
-        if (units > 500) {
-            charge += Math.min(units - 500, 100) * 8.40;
-        }
-        if (units > 600) {
-            charge += Math.min(units - 600, 200) * 9.45;
-        }
-        if (units > 800) {
-            charge += (units - 800) * 11.55;
-        }
-
-        return charge;
     }
 }
